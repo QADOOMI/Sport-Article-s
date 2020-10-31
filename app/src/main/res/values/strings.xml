@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Sports Articles</string>
+    <string name="articles_not_available_right_now_try_later">Articles not available right now, try later.</string>
+    <string name="refresh_articles">Refresh Page</string>
+    <string name="article_s_description_title">Article\'s Description</string>
+</resources>
