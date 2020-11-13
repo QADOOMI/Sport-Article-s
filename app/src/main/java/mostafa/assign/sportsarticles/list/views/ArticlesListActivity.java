@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.Group;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ContentLoadingProgressBar;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,7 +27,9 @@ import mostafa.assign.sportsarticles.R;
 import mostafa.assign.sportsarticles.controller.SportArticlesView;
 import mostafa.assign.sportsarticles.databinding.ActivityArticlesListBinding;
 import mostafa.assign.sportsarticles.list.model.Article;
+import mostafa.assign.sportsarticles.list.model.ArticleResponse;
 import mostafa.assign.sportsarticles.list.presenter.SportPresenter;
+import mostafa.assign.sportsarticles.viewmodel.MainViewModel;
 
 public class ArticlesListActivity extends AppCompatActivity implements SportArticlesView {
 
@@ -38,6 +42,8 @@ public class ArticlesListActivity extends AppCompatActivity implements SportArti
     private CompositeDisposable subscribers;
     private SportPresenter presenter;
 
+    private MainViewModel viewModel;
+
     private static final String TAG = "ArticlesListActivity";
 
     @Override
@@ -46,8 +52,31 @@ public class ArticlesListActivity extends AppCompatActivity implements SportArti
         binding = ActivityArticlesListBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        viewModel.init();
+        viewModel.getArticlesStream()
+                .observe(this, articles ->
+                        runOnUiThread(() -> {
+                            if (noArticlesGroup.getVisibility() == View.VISIBLE)
+                                noArticlesGroup.setVisibility(View.GONE);
+
+                            loadingBar.setVisibility(View.GONE);
+                            adapter.addArticles(articles);
+                        }));
+        viewModel.fetchSportArticles("gb", "sports");
+
         subscribers = new CompositeDisposable();
 
+        initViews();
+
+        presenter = new SportPresenter(getApplicationContext(), this);
+        loadingBar.setVisibility(View.VISIBLE);
+        loadingBar.show();
+        presenter.getSportArticles("gb", "sports");
+
+    }
+
+    private void initViews() {
         noArticlesGroup = binding.noArticlesGroup;
         loadingBar = binding.loadingArticlesBar;
 
@@ -59,23 +88,11 @@ public class ArticlesListActivity extends AppCompatActivity implements SportArti
         adapter = new ArticlesListAdapter(new ArrayList<>(), this);
 
         articles.post(() -> articles.setAdapter(adapter));
-
-        presenter = new SportPresenter(getApplicationContext(), this);
-        loadingBar.setVisibility(View.VISIBLE);
-        loadingBar.show();
-        presenter.getSportArticles("gb", "sports");
-
     }
 
     @Override
     public void onSportArticlesFetched(List<Article> articleList) {
-        runOnUiThread(() -> {
-            if (noArticlesGroup.getVisibility() == View.VISIBLE)
-                noArticlesGroup.setVisibility(View.GONE);
 
-            loadingBar.setVisibility(View.GONE);
-            adapter.addArticles(articleList);
-        });
     }
 
     @Override
