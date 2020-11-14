@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.Group;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ContentLoadingProgressBar;
+import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,6 +31,7 @@ import mostafa.assign.sportsarticles.list.model.Article;
 import mostafa.assign.sportsarticles.list.model.ArticleResponse;
 import mostafa.assign.sportsarticles.list.presenter.SportPresenter;
 import mostafa.assign.sportsarticles.viewmodel.MainViewModel;
+import mostafa.assign.sportsarticles.viewmodel.MainViewModelFactory;
 
 public class ArticlesListActivity extends AppCompatActivity implements SportArticlesView {
 
@@ -50,9 +52,11 @@ public class ArticlesListActivity extends AppCompatActivity implements SportArti
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityArticlesListBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        DataBindingUtil.setContentView(this, R.layout.activity_articles_list);
 
-        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        viewModel = ViewModelProviders
+                .of(this, MainViewModelFactory.INIT.factory)
+                .get(MainViewModel.class);
         viewModel.init();
         viewModel.getArticlesStream()
                 .observe(this, articles ->

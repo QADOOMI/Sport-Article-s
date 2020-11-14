@@ -2,8 +2,6 @@ package mostafa.assign.sportsarticles.viewmodel;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import java.util.List;
@@ -15,7 +13,6 @@ import mostafa.assign.sportsarticles.repositories.ArticleRepository;
 
 public class MainViewModel extends ViewModel {
 
-    private MutableLiveData<ArticleResponse> articles;
     private MediatorLiveData<List<Article>> articlesStream;
 
    public void init(){
@@ -24,11 +21,7 @@ public class MainViewModel extends ViewModel {
 
    }
 
-    public LiveData<ArticleResponse> getArticles() {
-        return articles;
-    }
-
-    public MediatorLiveData<List<Article>> getArticlesStream() {
+    public LiveData<List<Article>> getArticlesStream() {
         return articlesStream;
     }
 
